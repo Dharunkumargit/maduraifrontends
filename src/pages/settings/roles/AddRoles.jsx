@@ -87,7 +87,7 @@ const AddRoles = () => {
     const accessLevels = Object.entries(permissions).map(
       ([feature, perms]) => ({
         feature,
-        permissions: perms,
+        permissions: perms.filter((p) => p !== "All"),
       })
     );
   

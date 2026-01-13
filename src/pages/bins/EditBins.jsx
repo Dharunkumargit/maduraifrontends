@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -85,23 +85,18 @@ const InputField = ({
 );
 
 const EditBins = ({ onclose,item  }) => {
-  const [zone,setZone] = useState([]);
-  const [ward,setWard] = useState([]);
+  
   const {
     register,
     handleSubmit,
     reset,
-    watch,
+   
     formState: { errors },
   } = useForm({
     resolver: yupResolver(schema),
   });
 
-  const selectedZone = watch("zone");
-
-  const filteredWards = ward.filter(
-    (wards) => wards.zonename === selectedZone
-  );
+ 
   
   useEffect(() => {
     if (item) {
@@ -115,26 +110,12 @@ const EditBins = ({ onclose,item  }) => {
     }
   }, [item, reset]);
 
-  useEffect(() => {
-    axios.get(`${API}/ward/getwards`).then((res) => {
-      setWard(res.data.data || []);
-    });
-  }, []);
 
-  useEffect(() => {
-    axios.get(`${API}/zone/getzones`).then((res) => {
-      setZone(res.data.data || []);
-    });
-  }, []);
-
-  useEffect(() => {
-    reset((prev) => ({ ...prev, ward: "" }));
-  }, [selectedZone]);
 
   const onSubmit = async (data) => {
    try {
     const res = await axios.put(`${API}/bins/updatebinsbyid/${item._id}`, data); 
-    toast.success("Bin updated successfully");
+   toast.success(res.data.message || "Bin updated successfully");
 
     reset();
     onclose();
@@ -163,11 +144,7 @@ const EditBins = ({ onclose,item  }) => {
                   register={register}
                   errors={errors}
                   placeholder="Type Here"
-                  type="select"
-                  options={zone.map((zone) => ({
-                    value: zone.zonename,
-                    label: zone.zonename,
-                  }))}
+                 
                 />
 
                 <InputField
@@ -175,15 +152,7 @@ const EditBins = ({ onclose,item  }) => {
                   name="ward"
                   register={register}
                   errors={errors}
-                  disabled={!selectedZone}
-                  type="select"
-                  placeholder={
-                    selectedZone ? "Select Ward" : "Select Zone First"
-                  }
-                  options={filteredWards.map((w) => ({
-                    value: w.wardname,
-                    label: w.wardname,
-                  }))}
+                  
                 />
                 <InputField
                   label="Filled"

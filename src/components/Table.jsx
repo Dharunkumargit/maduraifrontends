@@ -75,7 +75,9 @@ const Table = ({
                   button_icon={addButtonIcon}
                   onClick={() => {
                     if (addroutepoint) {
-                      navigate(`${addroutepoint}`);
+                      navigate(`${addroutepoint}`
+                        
+                      );
                     }
                     if (AddModal === true) {
                       setShowAdd(false);

@@ -57,28 +57,32 @@ const Login = () => {
     <div className="flex min-h-screen">
       {/* Left Section with Image */}
       <div
-        className="w-1/2 relative bg-cover bg-center inset-0 flex justify-center"
+        className="w-1/2 relative bg-cover bg-center inset-0 items-center flex"
         style={{ backgroundImage: `url(${bgImage})` }}
       >
-        <div className="absolute inset-0 bg-black/20"></div>
-        <div className="relative pt-11">
-          <div className="pl-33 my-4">
-            <img src={logo} alt="Madurai Logo" className="w-22" />
-          </div>
-          <div className="text-black bg-white/37 transparent rounded-l-4xl px-10 py-10 w-120 h-107 ml-37">
-            <h1 className="text-7xl font-semibold font-roboto-flex mt-10 px-5">
-              Vanakkamnmmmm <br />
-              <span className="block mt-6">Madurai</span>
-            </h1>
-          </div>
-        </div>
+        <div className="absolute inset-0 bg-black/20 flex flex-col justify-center">
+  {/* Logo Container - Positioned Top Left */}
+  <div className="absolute top-10 left-10 md:left-20">
+    <img src={logo} alt="Madurai Logo" className="w-20 md:w-24 object-contain" />
+  </div>
+
+  {/* Content Card - Aligned Right */}
+  <div className="flex justify-end h-108">
+    <div className="bg-white/35  rounded-l-[3rem]  md:pt-18 md:pl-15 w-130 max-w-2xl shadow-2xl">
+      <h1 className="text-xl md:text-7xl font-bold font-roboto-flex text-black ">
+        Vanakkam <br />
+        <span className="block mt-7 text-black">Madurai</span>
+      </h1>
+    </div>
+  </div>
+</div>
       </div>
 
       {/* Right Side Blue Background */}
       <div className="w-1/2 bg-[#1E3A8A]" />
 
       {/* Login Form */}
-      <div className="absolute inset-0 flex justify-center items-center ml-100">
+      <div className="absolute inset-0 flex justify-center items-center ml-100 ">
         <div className="w-full max-w-lg bg-white p-6 rounded-xl font-roboto-flex">
           <div className="flex justify-center items-center">
             <p className="text-4xl font-semibold my-4">Login</p>
@@ -87,7 +91,7 @@ const Login = () => {
           <form className="mx-4 mt-2" onSubmit={handleSubmit(handleLogin)}>
             {/* Email Field */}
             <label className="grid mb-4 font-semibold">
-              Email ID
+              Email ID 
               <input
                 type="text"
                 {...register("email")}

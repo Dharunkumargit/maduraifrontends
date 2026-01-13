@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 import Title from "../../../components/Title";
 import { IoSave } from "react-icons/io5";
@@ -12,7 +12,7 @@ const EditRoles = () => {
   const [selectedSettings, setSelectedSettings] = useState({});
   const [permissions, setPermissions] = useState({});
   const location = useLocation();
-  const {roleId} = location.state || {};
+  const roleId = location.state?.item?.role_id; 
   const navigate = useNavigate();
 
   const settingsOptions = [
@@ -41,27 +41,39 @@ const EditRoles = () => {
       fetchExistingRole();
     }
   }, [roleId]);
-  const fetchExistingRole = async () => {
-    try{
-      const response = await axios.get(`${API}/roles/getrolebyid?roleId=${roleId}`);
-      setRoleName(response.data.data.role_name);
-      const accessLevelsArr = response.data.data.accessLevels || [];
-      const perms = {};
-      const selected = {};
+ const fetchExistingRole = useCallback(async () => {
+  try {
+    const response = await axios.get(
+      `${API}/roles/getrolebyid?roleId=${roleId}`
+    );
 
-      accessLevelsArr.forEach((item) => {
-        selected[item.feature] = true;
-        perms[item.feature] = item.permissions;
-      });
+    const role = response.data.data;
+    setRoleName(role.role_name);
 
-      setSelectedSettings(selected);
-      setPermissions(perms);
-      
-    }catch(error){
-      console.log(error);
-    }
-  
+    const selected = {};
+    const perms = {};
+
+    role.accessLevels.forEach(({ feature, permissions }) => {
+      selected[feature] = true;
+
+      const allPermsExceptAll = permissionOptions.filter(p => p !== "All");
+
+      const hasAll =
+        allPermsExceptAll.every(p => permissions.includes(p));
+
+      perms[feature] = hasAll
+        ? ["All", ...allPermsExceptAll]
+        : permissions;
+    });
+
+    setSelectedSettings(selected);
+    setPermissions(perms);
+  } catch (error) {
+    console.error(error);
+    toast.error("Failed to load role data");
   }
+}, [roleId]);
+
   const toggleSetting = (setting) => {
     setSelectedSettings((prev) => ({
       ...prev,
@@ -80,57 +92,67 @@ const EditRoles = () => {
   
   // Handle Permission Changes
   const handlePermissionChange = (setting, permission, checked) => {
-    setPermissions(prev => {
-      let updated = prev[setting] || [];
-  
-      if (permission === "All") {
-        updated = checked ? permissionOptions.slice(1) : [];
-      } else {
-        updated = checked
-          ? [...updated, permission]
-          : updated.filter(p => p !== permission);
-      }
-  
-      // Derive "All" only for UI
-      if (updated.length === permissionOptions.length - 1) {
-        return { ...prev, [setting]: ["All", ...updated] };
-      }
-  
-      return { ...prev, [setting]: updated.filter(p => p !== "All") };
-    });
-  };
+  setPermissions(prev => {
+    let current = prev[setting] || [];
+
+    if (permission === "All") {
+      return {
+        ...prev,
+        [setting]: checked ? permissionOptions : [],
+      };
+    }
+
+    let updated = checked
+      ? [...current.filter(p => p !== "All"), permission]
+      : current.filter(p => p !== permission && p !== "All");
+
+    const allPermsExceptAll = permissionOptions.filter(p => p !== "All");
+
+    if (allPermsExceptAll.every(p => updated.includes(p))) {
+      updated = ["All", ...allPermsExceptAll];
+    }
+
+    return { ...prev, [setting]: updated };
+  });
+};
+
 
   const handleSave = async () => {
-    const accessLevels = Object.entries(permissions).map(
-      ([feature, perms]) => ({
-        feature,
-        permissions: perms.filter(p => p !== "All"),
-      })
-    );
-    const roleAccessLevel = {
-      role_name: roleName.trim(),
-      accessLevels,
-      status: "active",
-    };
-    
-    try{
-      const response = await axios.put(`${API}/roles/updaterolebyid?roleId=${roleId}`, roleAccessLevel);
-      console.log("Saved role:", response.data);
-      
-      toast.success("Role Updated Successfully");
-      
-      navigate("/settings/roles");
-    }catch(error){
-      console.log(error);
-      toast.error("Failed to update role");
-    }
-    
-    // console.log("Saved role:", {
-    //   roleName,
-    //   createdBy,
-    //   permissions,
-    // });
+  const accessLevels = Object.entries(permissions)
+    .filter(([feature]) => selectedSettings[feature])
+    .map(([feature, perms]) => ({
+      feature,
+      permissions: perms.filter(p => p !== "All"),
+    }));
+
+  if (!roleName.trim()) {
+    return toast.error("Role name is required");
+  }
+
+  if (accessLevels.length === 0) {
+    return toast.error("Select at least one setting");
+  }
+
+  const payload = {
+    role_name: roleName.trim(),
+    accessLevels,
+    status: "ACTIVE",
   };
+
+  try {
+    await axios.put(
+      `${API}/roles/updaterolebyid?roleId=${roleId}`,
+      payload
+    );
+
+    toast.success("Role updated successfully");
+    navigate("/settings/roles");
+  } catch (error) {
+    console.error(error);
+    toast.error("Failed to update role");
+  }
+};
+
 
   return (
     <>

@@ -46,6 +46,7 @@ const AddEmploye = ({ onclose, }) => {
     formState: { errors },
   } = useForm({
     resolver: yupResolver(schema),
+    
   });
   
   
