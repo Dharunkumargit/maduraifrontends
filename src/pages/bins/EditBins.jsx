@@ -135,6 +135,7 @@ const EditBins = ({ onclose,item  }) => {
    try {
     const res = await axios.put(`${API}/bins/updatebinsbyid/${item._id}`, data); 
     toast.success("Bin updated successfully");
+
     reset();
     onclose();
    } catch (err) {
@@ -193,6 +194,7 @@ const EditBins = ({ onclose,item  }) => {
                   
                  
                 />
+
                 
                 
               </div>

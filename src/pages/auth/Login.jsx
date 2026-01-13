@@ -67,7 +67,7 @@ const Login = () => {
           </div>
           <div className="text-black bg-white/37 transparent rounded-l-4xl px-10 py-10 w-120 h-107 ml-37">
             <h1 className="text-7xl font-semibold font-roboto-flex mt-10 px-5">
-              Vanakkam <br />
+              Vanakkamnmmmm <br />
               <span className="block mt-6">Madurai</span>
             </h1>
           </div>
