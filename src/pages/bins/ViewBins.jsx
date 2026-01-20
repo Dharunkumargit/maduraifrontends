@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import Title from "../../components/Title";
 import { useLocation } from "react-router";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
@@ -6,7 +6,7 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { binImages } from "../../binImages.js";
 
-/* 🔧 FIX: Leaflet marker issue in production (LIVE LINK) */
+/* 🔧 FIX: Leaflet marker issue in production */
 delete L.Icon.Default.prototype._getIconUrl;
 
 L.Icon.Default.mergeOptions({
@@ -22,6 +22,9 @@ const ViewBins = () => {
   const { state } = useLocation();
   const user = state?.item;
 
+  /* 🖼 Popup Image State */
+  const [selectedImage, setSelectedImage] = useState(null);
+
   /* 🔹 Filter images by BIN ID & sort latest first */
   const latestPhotos = useMemo(() => {
     return binImages
@@ -29,7 +32,7 @@ const ViewBins = () => {
       .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
   }, [user?.binid]);
 
-  /* 🔹 Latest fill level from images */
+  /* 🔹 Latest fill level */
   const latestFill =
     latestPhotos.length > 0 ? latestPhotos[0].fill_level : user?.filled;
 
@@ -56,9 +59,11 @@ const ViewBins = () => {
               <p className="col-span-4 font-medium">{field.label}</p>
 
               <div className="col-span-6 text-light-grey">
-                {/* 📍 LOCATION MAP */}
+                {/* 📍 LOCATION MAP (HIDDEN WHEN POPUP OPEN) */}
                 {field.label === "Location" ? (
-                  user?.latitude && user?.longitude ? (
+                  !selectedImage &&
+                  user?.latitude &&
+                  user?.longitude ? (
                     <div className="space-y-2">
                       <MapContainer
                         center={[
@@ -78,6 +83,7 @@ const ViewBins = () => {
                           <Popup>{user?.street || "Bin Location"}</Popup>
                         </Marker>
                       </MapContainer>
+
                       <p className="text-sm font-medium">
                         {user?.location}
                       </p>
@@ -96,7 +102,10 @@ const ViewBins = () => {
                           key={index}
                           src={photo.image_url}
                           alt={`Bin ${user?.binid}`}
-                          className="w-24 h-24 object-cover rounded-lg shadow border"
+                          className="w-24 h-24 object-cover rounded-lg shadow  cursor-pointer hover:scale-105 transition"
+                          onClick={() =>
+                            setSelectedImage(photo.image_url)
+                          }
                         />
                       ))
                     ) : (
@@ -123,6 +132,27 @@ const ViewBins = () => {
           ))}
         </div>
       </div>
+
+      {/* 🖼 IMAGE POPUP MODAL */}
+      {selectedImage && (
+        <div
+          className="fixed inset-0 justify-center items-center backdrop-blur-xs backdrop-grayscale-50 flex drop-shadow-lg z-50"
+          onClick={() => setSelectedImage(null)}
+        >
+          <div
+            className="relative rounded-xl p-4 max-w-lg w-full"
+            onClick={(e) => e.stopPropagation()}
+          >
+           
+
+            <img
+              src={selectedImage}
+              alt="Bin Preview"
+              className="w-full h-auto rounded-lg"
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

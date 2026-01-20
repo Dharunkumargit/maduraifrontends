@@ -135,11 +135,7 @@ const EditWard = ({ onclose,item }) => {
                   register={register}
                   errors={errors}
                   placeholder="Select Here"
-                  type="select"
-                  options={Array.from({length:342},(_,i)=>({
-                    value :i+1,
-                    label :i+1
-                  }))}
+                 
 
                 />
                 <InputField

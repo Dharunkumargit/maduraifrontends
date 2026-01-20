@@ -21,15 +21,7 @@ const schema = yup.object().shape({
     .string()
     
     .required("Ward Name is required"),
-  totalbins: yup
-    .string()
-    
-    .required("Total Bins is required"),
   
-    status: yup
-    .string()
-    
-    .required("Status is required"),
 });
 
 const AddWard = ({ onclose,onRefresh }) => {
@@ -107,32 +99,7 @@ const AddWard = ({ onclose,onRefresh }) => {
                   
                 />
                 
-                <InputField
-                  label="Total Bins"
-                  name="totalbins"
-                  register={register}
-                  errors={errors}
-                  placeholder="Select Here"
-                  type="select"
-                  options={Array.from({length:342},(_,i)=>({
-                    value :i+1,
-                    label :i+1
-                  }))}
-
-                />
                 
-               <InputField 
-               label="Status" 
-               name="status"
-               register={register}
-               errors={errors}
-               type="select"
-               placeholder="Select Here"
-               options={[
-                { value: "Active", label: "Active" },
-                { value: "Inactive", label: "Inactive" },
-              ]}
-               />    
             
               </div>
             </div>

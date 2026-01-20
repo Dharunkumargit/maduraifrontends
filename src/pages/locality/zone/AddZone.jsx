@@ -17,17 +17,7 @@ const schema = yup.object().shape({
     .string()
 
     .required("Zone Name is required"),
-  totalbins: yup
-    .string()
-    
-    .required("Total Bins is required"),
   
-
-  status: yup
-    .string()
-
-    .oneOf(["Active", "Inactive"], "Invalid Status")
-    .required("Status is required"),
 });
 
 const AddZone = ({ onclose,onRefresh }) => {
@@ -79,34 +69,9 @@ const AddZone = ({ onclose,onRefresh }) => {
                   
                   errors={errors}
                 />
-                <InputField
-                  label="Total Bins"
-                  name="totalbins"
-                  placeholder="Select here"
-                  type="select"
-                  register={register}
-                  errors={errors}
-                  options={Array.from({length:342},(_,i)=>({
-                    value :i+1,
-                    label :i+1
-                  }))}
-                />
-                
-                
-
-                <InputField
-                  label="Status"
-                  name="status"
-                  register={register}
-                  errors={errors}
-                  placeholder="Type Here"
-                  type="select"
-                  options={[
-                    { value: "Active", label: "Active" },
-                    { value: "Inactive", label: "Inactive" },
-                  ]}
+               
                   
-                />
+                
               </div>
             </div>
             <div className="mx-7 text-xs flex lg:justify-end md:justify-center justify-center gap-2 mb-4">
