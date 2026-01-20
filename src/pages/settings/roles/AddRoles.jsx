@@ -93,6 +93,7 @@ const AddRoles = () => {
   
     const roleAccessLevel = {
       role_name: roleName,
+      status: "ACTIVE",
       accessLevels,
       created_by_user: createdBy,
     };

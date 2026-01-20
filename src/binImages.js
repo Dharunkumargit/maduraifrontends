@@ -1,37 +1,35 @@
 export const binImages = [
-    {
-      bin_id: "BINMC997",
-      timestamp: "2025-01-12T10:30:15",
+  {
+    bin_id: "MSB001",
+    latest_1: {
+      timestamp: "2026-01-20T07:43:29",
       image_url:
-         "https://cctv-frontend-config.s3.ap-south-1.amazonaws.com/BINMC997/2025-12-17_12-19-22.jpg",
-      fill_level: 25,
-    },
-    {
-      bin_id: "BINMCEDB",
-      timestamp: "2025-01-12T10:30:15",
-      image_url:
-        "https://cctv-frontend-config.s3.ap-south-1.amazonaws.com/BINMCEDB/2025-12-17_12-19-22.jpg",
+        "https://my-cctv-uploads.s3.us-east-1.amazonaws.com/camera/1/2026/01/20/1_20260120_074329.jpg",
       fill_level: 50,
     },
-    {
-      bin_id: "BINMC8E6",
-      timestamp: "2025-01-12T10:30:15",
+    latest_2: {
+      timestamp: "2026-01-20T07:43:29",
       image_url:
-        "https://cctv-frontend-config.s3.ap-south-1.amazonaws.com/BINMC8E6/2025-12-17_12-19-22.jpg",
-      fill_level: 75,
+        "https://my-cctv-uploads.s3.us-east-1.amazonaws.com/camera/1/2026/01/20/1_20260120_074329.jpg",
+      fill_level: 50,
     },
-    {
-      bin_id: "BINMCD35",
-      timestamp: "2025-01-12T10:30:15",
+    latest_3: {
+      timestamp: "2026-01-20T07:43:29",
       image_url:
-      "https://cctv-frontend-config.s3.ap-south-1.amazonaws.com/BINMCD35/2025-12-17_12-19-22.jpg",
-      fill_level: 0,
+        "https://my-cctv-uploads.s3.us-east-1.amazonaws.com/camera/1/2026/01/20/1_20260120_074329.jpg",
+      fill_level: 50,
     },
-    {
-      bin_id: "BINMC9AB",
-      timestamp: "2025-01-12T10:30:15",
+    latest_4: {
+      timestamp: "2026-01-20T07:43:29",
       image_url:
-       "https://cctv-frontend-config.s3.ap-south-1.amazonaws.com/BINMC9AB/2025-12-17_12-19-22.jpg",
-      fill_level: 100,
+        "https://my-cctv-uploads.s3.us-east-1.amazonaws.com/camera/1/2026/01/20/1_20260120_074329.jpg",
+      fill_level: 50,
     },
-  ];
+    latest_5: {
+      timestamp: "2026-01-20T07:43:29",
+      image_url:
+        "https://my-cctv-uploads.s3.us-east-1.amazonaws.com/camera/1/2026/01/20/1_20260120_074329.jpg",
+      fill_level: 50,
+    },
+  },
+];
