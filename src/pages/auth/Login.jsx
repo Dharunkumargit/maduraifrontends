@@ -137,13 +137,13 @@ const Login = () => {
               Forgot Password?
             </p> */}
 
-            {/* Remember Me */}.
-            <div className="flex items-center ">
+            {/* Remember Me */}
+            <div className="flex items-center mt-7">
               <input type="checkbox" className="mr-2" />
               <label>Remember me</label>
             </div>
 
-            {/* Submit Button */}
+            
             <button
                   //  onClick={()=>navigate("/dashboard")}
               type="submit"

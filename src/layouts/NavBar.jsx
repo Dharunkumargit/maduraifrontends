@@ -9,13 +9,19 @@ import { useNavigate } from "react-router";
 const NavBar = () => {
   const navigate = useNavigate();
   const [userInitials, setUserInitials] = useState("U");
+  const [userName, setUserName] = useState("User");
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
 
     if (storedUser) {
       const user = JSON.parse(storedUser);
+      if (user?.name) {
+        setUserName(user.name);
+      } else if (user?.email) {
+        setUserName(user.email.split("@")[0]);
+      }
 
-      // ✅ Priority: name → email
+      
       let initials = "U";
 
       if (user?.name) {
@@ -51,7 +57,7 @@ const NavBar = () => {
       </div>
       <div className="flex justify-center lg:p-2 md:p-2 p-1.5 lg:gap-3.5 md:gap-2   items-center text-center  rounded-full mr-3">
         <div className=" flex  items-center gap-2 text-sm font-extralight  text-dark-blue">
-          Profile name
+           {userName}
           <div className="">
             <button onClick={() => navigate("/dashboard/profile")} className="bg-light-blue text-dark-blue font-medium w-9 h-9 text-sm rounded-full flex cursor-pointer items-center justify-center" 
                >
@@ -60,9 +66,7 @@ const NavBar = () => {
             </button>
           </div>
         </div>
-        <p className="bg-light-blue w-9 h-9  p-2 rounded-full">
-          <HiOutlineBell className=" size-5 text-dark-blue" />
-        </p>
+        
 
         
       </div>

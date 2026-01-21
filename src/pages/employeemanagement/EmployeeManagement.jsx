@@ -11,7 +11,7 @@ const EmployeeManagement = () => {
   const [employees, setEmployees] = useState([]);
   const Columns = [
     { label: "Name", key: "name" },
-    { label: "Role", key: "role" },
+    
     { label: "Phone Number", key: "phonenumber" },
     
     { label: "Location", key: "location" },

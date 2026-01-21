@@ -16,10 +16,7 @@ const schema = yup.object().shape({
     .string()
 
     .required("Name is required"),
-  role: yup
-    .string()
-    
-    .required("role is required"),
+  
     phonenumber: yup
     .string()
     .required("Phone number is required")
@@ -38,7 +35,7 @@ const schema = yup.object().shape({
 
 const AddEmploye = ({ onclose, }) => {
     
-    const [roles, setRoles] = useState([]);
+    
   const {
     register,
     handleSubmit,
@@ -50,29 +47,9 @@ const AddEmploye = ({ onclose, }) => {
   });
   
   
-  useEffect(() => {
-    axios.get(`${API}/roles/getroles`)
-      .then((response) => {
-        setRoles(response.data.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching roles:", error);
-      });
-  }, []);
+ 
 
-  useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("lastUser"));
-
-    if (user) {
-      reset({
-        name: user.name,
-        role: user.role,
-        phonenumber: user.phonenumber,
-        location: "",
-        designation: "",
-      });
-    }
-  }, [reset]);
+  
   
 
  const onSubmit = async (data) => {
@@ -112,18 +89,7 @@ const AddEmploye = ({ onclose, }) => {
                   register={register}
                   errors={errors}
                 />
-                <InputField
-                  label="Role"
-                  name="role"
-                  placeholder="Select here"
-                  type="select"
-                  register={register}
-                  errors={errors}
-                  options={roles.map((role) => ({
-                    value: role.role_name,
-                    label: role.role_name,
-                  }))}
-                />
+                
                 
                 <InputField
                   label="Phone Number"
