@@ -53,12 +53,7 @@ const ResetPassword = () => {
           </span>
         </label>
   
-         {/* <p
-                onClick={() => navigate("/forgotpassword")}
-                className="text-right text-sm cursor-pointer hover:underline mt-4 "
-              >
-                Forgot Password?
-              </p> */}
+         
         <p
           
           className="cursor-pointer text-white bg-darkest-blue text-center w-full py-2 my-2 mt-5 rounded-md text-lg font-semibold transition duration-200"

@@ -6,6 +6,8 @@ import AddEmploye from './AddEmploye';
 import { LuContact } from 'react-icons/lu';
 import { API } from '../../../const';
 import axios from 'axios';
+import { toast } from 'react-toastify';
+import EditEmployee from './EditEmployee';
 
 const EmployeeManagement = () => {
   const [employees, setEmployees] = useState([]);
@@ -13,7 +15,7 @@ const EmployeeManagement = () => {
     { label: "Name", key: "name" },
     
     { label: "Phone Number", key: "phonenumber" },
-    
+    { label: "Email ID", key: "emailid" },
     { label: "Location", key: "location" },
     { label: "Designation", key: "designation" },
     { label: "Status", key: "status" },
@@ -31,6 +33,27 @@ const EmployeeManagement = () => {
   useEffect(() => {
     getEmployees();
   }, []);
+ 
+  const handleDelete = async (id) => {
+  const confirmDelete = window.confirm(
+    "Are you sure you want to delete?"
+  );
+
+  if (!confirmDelete) return;
+
+  try {
+    await axios.delete(`${API}/employee/deleteemployee/${id}`);
+
+    toast.success("Employee deleted successfully");
+
+    // ✅ Correct state update
+    setEmployees((prev) => prev.filter((emp) => emp._id !== id));
+
+  } catch (error) {
+    console.error("Delete error:", error);
+    toast.error(error.response?.data?.message || "Delete failed");
+  }
+};
 
   
 
@@ -47,7 +70,9 @@ const EmployeeManagement = () => {
       }} />}
       
       showViewButton={false}
-      
+      showDeleteButton={true}
+      onDelete={handleDelete}
+      EditModal={EditEmployee}
       />
     </div>
   )
