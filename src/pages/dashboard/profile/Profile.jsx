@@ -1,47 +1,47 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Edit_profile from "./Edit_profile";
 import Update_Password from "./Update_Password";
 import logo from "../../../assets/images/Profile2.png";
-import { toast } from "react-toastify";
-import axios from "axios";
-import { API } from "../../../../const";
 
 const Profile = () => {
   const [activeSection, setActiveSection] = useState("editProfile");
-  const user = JSON.parse(localStorage.getItem("user"));
-  const userId = user.user_id;
+  const [user, setUser] = useState(() => {
+    const stored = localStorage.getItem("user");
+    return stored ? JSON.parse(stored) : null;
+  });
 
-  
-  const handleProfileSave = async (data) => {
-  try {
-    const res = await axios.put(
-      `${API}/users/update/${userId}`,
-      data
-    );
+  const handleProfileSave = (data) => {
+    // Update user state with new data
+    const updatedUser = {
+      ...user,
+      name: data.name,
+      email: data.email,
+      phonenumber: data.phonenumber,
+    };
 
-    toast.success("Profile updated successfully");
-
-    // update localStorage
-    const updatedUser = { ...user, ...data };
-    localStorage.setItem("user", JSON.stringify(updatedUser));
-
-    // update state
+    // Update state
     setUser(updatedUser);
-  } catch (error) {
-    toast.error("Failed to update profile");
-    console.error(error);
+
+    // Update localStorage
+    localStorage.setItem("user", JSON.stringify(updatedUser));
+  };
+
+  if (!user) {
+    return (
+      <div className="p-6 bg-white">
+        <p>Please log in to view your profile.</p>
+      </div>
+    );
   }
-};
 
   return (
-    <div className="p-6 bg-white mb-14   mr-4">
+    <div className="p-6 bg-white mb-14 mr-4">
       <h1 className="text-2xl font-bold">My Profile</h1>
       <p className="text-sm text-light-grey">
         Manage your personal details and account settings.
       </p>
 
       <div className="flex flex-col md:flex-row gap-8 mt-7">
-        {/* LEFT CARD */}
         <div className="shadow-md rounded-lg p-6 flex flex-col items-center h-120">
           <img
             src={logo}
@@ -49,15 +49,10 @@ const Profile = () => {
             className="w-40 h-40 rounded-full mb-4"
           />
 
-          {user && (
-            <>
-              <h2 className="text-lg font-semibold">{user.name}</h2>
-              <p className="text-sm text-light-grey">{user.role || "User"}</p>
-              <p className="text-sm text-light-grey">{user.email}</p>
-              
-              
-            </>
-          )}
+          <h2 className="text-lg font-semibold">{user.name}</h2>
+          <p className="text-sm text-light-grey">{user.role || "User"}</p>
+          <p className="text-sm text-light-grey">{user.email}</p>
+          
 
           <div className="flex gap-3 mt-4">
             <button
@@ -84,12 +79,11 @@ const Profile = () => {
           </div>
         </div>
 
-       
         <div>
           {activeSection === "editProfile" ? (
             <Edit_profile user={user} onSave={handleProfileSave} />
           ) : (
-            <Update_Password userId={userId} />
+            <Update_Password user={user} />
           )}
         </div>
       </div>

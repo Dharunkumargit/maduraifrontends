@@ -21,24 +21,24 @@ const schema = yup.object().shape({
     .string()
     
     .required("Ward Name is required"),
-  totalbins: yup
-    .string()
+  // totalbins: yup
+  //   .string()
     
-    .required("Total Bins is required"),
-  activebins: yup
-    .string()
+  //   .required("Total Bins is required"),
+  // activebins: yup
+  //   .string()
     
-    .required("Active Bins is required"),
+  //   .required("Active Bins is required"),
 
-  inactivebins: yup
-    .string()
+  // inactivebins: yup
+  //   .string()
 
     
-    .required("Inactive Bins is required"),
-    status: yup
-    .string()
+  //   .required("Inactive Bins is required"),
+  //   status: yup
+  //   .string()
     
-    .required("Status is required"),
+  //   .required("Status is required"),
 });
 
 const EditWard = ({ onclose,item }) => {
@@ -68,10 +68,10 @@ const EditWard = ({ onclose,item }) => {
       reset({
         zonename: item.zonename,
         wardname: item.wardname,
-        totalbins: item.totalbins,
-        activebins: item.activebins,
-        inactivebins: item.inactivebins,
-        status: item.status,
+        // totalbins: item.totalbins,
+        // activebins: item.activebins,
+        // inactivebins: item.inactivebins,
+        // status: item.status,
       });
     }
   }, [item, reset]);
@@ -129,7 +129,7 @@ const EditWard = ({ onclose,item }) => {
                   
                 />
                 
-                <InputField
+                {/* <InputField
                   label="Total Bins"
                   name="totalbins"
                   register={register}
@@ -165,7 +165,7 @@ const EditWard = ({ onclose,item }) => {
                 { value: "Active", label: "Active" },
                 { value: "Inactive", label: "Inactive" },
               ]}
-               />    
+               />     */}
             
               </div>
             </div>

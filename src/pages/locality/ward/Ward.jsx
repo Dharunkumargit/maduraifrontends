@@ -7,21 +7,32 @@ import AddWard from './AddWard';
 import { API } from '../../../../const';
 import EditWard from './EditWard';
 import { toast } from 'react-toastify';
+import { get } from 'mongoose';
+import Pagination from '../../../components/Pagination';
 
 const Ward = () => {
   const [wards, setWards] = useState([]);
-  const getWards = async () => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+
+  const itemsPerPage = 8;
+
+  const getWards = async (page = 1) => {
     try {
-      const res = await axios.get(`${API}/ward/getwards`, wards);
-      setWards(res.data.data); 
+      const res = await axios.get(
+        `${API}/ward/getwards?page=${page}&limit=${itemsPerPage}`
+      );
+
+      setWards(res.data.data);
+      setTotalItems(res.data.pagination.totalItems);
     } catch (error) {
       console.log("Ward Fetch Error:", error);
     }
   };
 
   useEffect(() => {
-    getWards();
-  }, []);
+    getWards(currentPage);
+  }, [currentPage]);
 
     const Columns = [
         { label: "Zone", key: "zonename" },
@@ -40,7 +51,7 @@ const Ward = () => {
         try {
           await axios.delete(`${API}/ward/deleteward/${id}`);
           toast.success("Ward deleted successfully");
-          // Remove row instantly
+          getWards(currentPage);
           setWards((prev) => prev.filter((ward) => ward._id !== id));
         } catch (error) {
           toast.error("Failed to delete ward");
@@ -58,6 +69,12 @@ const Ward = () => {
         addButtonLabel="Add Ward"
         addButtonIcon={<RiUserAddLine size={22} />}
         AddModal={(props) => <AddWard {...props} onRefresh={getWards} />}/>
+        <Pagination
+        totalItems={totalItems}
+        itemsPerPage={itemsPerPage}
+        currentPage={currentPage}
+        setCurrentPage={setCurrentPage}
+      />
     </div>
   )
 }

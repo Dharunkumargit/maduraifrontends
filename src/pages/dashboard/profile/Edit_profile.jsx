@@ -8,7 +8,7 @@ import { API } from "../../../../const";
 
 const schema = yup.object().shape({
   name: yup.string().required("Full name is required"),
-  emailid: yup
+  email: yup
     .string()
     .email("Enter a valid email address")
     .required("Email is required"),
@@ -18,7 +18,7 @@ const schema = yup.object().shape({
     .required("Phone number is required"),
 });
 
-const Edit_profile = ({ user, onClose }) => {
+const Edit_profile = ({ user, onSave }) => {
   const {
     register,
     handleSubmit,
@@ -32,7 +32,7 @@ const Edit_profile = ({ user, onClose }) => {
     if (user) {
       reset({
         name: user.name || "",
-        emailid: user.email || "",
+        email: user.email || "",
         phonenumber: user.phonenumber || "",
       });
     }
@@ -40,9 +40,20 @@ const Edit_profile = ({ user, onClose }) => {
 
   const onSubmit = async (data) => {
     try {
-      await axios.put(`${API}/employee/updateemployee/${user._id}`, data);
+      // Use the correct endpoint from your router
+      await axios.put(`${API}/user/updateuserbyid/${user.id}`, {
+        name: data.name,
+        email: data.email,
+        phonenumber: data.phonenumber,
+        role: user.role // Keep existing role
+      });
+
       toast.success("Profile Updated Successfully!");
-      onClose();
+      
+      // Call parent callback to update state
+      if (onSave) {
+        onSave(data);
+      }
     } catch (error) {
       toast.error(
         error.response?.data?.message || "Failed to update profile"
@@ -51,55 +62,55 @@ const Edit_profile = ({ user, onClose }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      <div className="flex flex-col gap-1">
-        <p className="font-semibold text-sm">Full Name</p>
-        <input
-          {...register("name")}
-          className="w-96 py-3 px-2 rounded-md bg-light-blue"
-        />
-        {errors.name && (
-          <p className="text-red-500 text-sm">{errors.name.message}</p>
-        )}
-      </div>
+    <div className=" ">
+      <h3 className="text-lg font-semibold mb-4">Edit Profile</h3>
+      <div className="space-y-4">
+        <div className="flex flex-col gap-1">
+          <p className="font-semibold text-sm">Full Name</p>
+          <input
+            {...register("name")}
+            className="w-96 py-3 px-2 rounded-md bg-light-blue"
+          />
+          {errors.name && (
+            <p className="text-red-500 text-sm">{errors.name.message}</p>
+          )}
+        </div>
 
-      {/* Email */}
-      <div className="flex flex-col gap-1">
-        <p className="font-semibold text-sm">Email ID</p>
-        <input
-          {...register("emailid")}
-          className="w-96 py-3 px-2 rounded-md bg-light-blue"
-        />
-        {errors.emailid && (
-          <p className="text-red-500 text-sm">{errors.emailid.message}</p>
-        )}
-      </div>
+        <div className="flex flex-col gap-1">
+          <p className="font-semibold text-sm">Email ID</p>
+          <input
+            {...register("email")}
+            className="w-96 py-3 px-2 rounded-md bg-light-blue"
+          />
+          {errors.email && (
+            <p className="text-red-500 text-sm">{errors.email.message}</p>
+          )}
+        </div>
 
-      {/* Phone */}
-      <div className="flex flex-col gap-1">
-        <p className="font-semibold text-sm">Phone number</p>
-        <input
-          {...register("phonenumber")}
-          className="w-96 py-3 px-2 rounded-md bg-light-blue"
-        />
-        {errors.phonenumber && (
-          <p className="text-red-500 text-sm">
-            {errors.phonenumber.message}
-          </p>
-        )}
-      </div>
+        <div className="flex flex-col gap-1">
+          <p className="font-semibold text-sm">Phone number</p>
+          <input
+            {...register("phonenumber")}
+            className="w-96 py-3 px-2 rounded-md bg-light-blue"
+          />
+          {errors.phonenumber && (
+            <p className="text-red-500 text-sm">
+              {errors.phonenumber.message}
+            </p>
+          )}
+        </div>
 
-      {/* Buttons */}
-      <div className="flex gap-3 mt-4">
-        
-        <button
-          type="submit"
-          className="bg-darkest-blue text-white px-6 py-2 rounded"
-        >
-          Save Profile
-        </button>
+        <div className="flex gap-3 mt-4">
+          <button
+            onClick={handleSubmit(onSubmit)}
+            type="button"
+            className="bg-darkest-blue text-white px-6 py-2 rounded"
+          >
+            Save Profile
+          </button>
+        </div>
       </div>
-    </form>
+    </div>
   );
 };
 

@@ -17,19 +17,19 @@ const schema = yup.object().shape({
     .string()
 
     .required("Zone Name is required"),
-  totalbins: yup
-    .string()
+  // totalbins: yup
+  //   .string()
     
-    .required("Total Bins is required"),
-  activebins: yup
-    .string()
+  //   .required("Total Bins is required"),
+  // activebins: yup
+  //   .string()
     
-    .required("Active Bins is required"),
+  //   .required("Active Bins is required"),
    
-  inactivebins: yup
-    .string()
+  // inactivebins: yup
+  //   .string()
     
-    .required("Inactive Bins is required"),
+  //   .required("Inactive Bins is required"),
 
   
 });
@@ -50,9 +50,9 @@ const EditZone = ({ onclose ,item }) => {
     if (item) {
       reset({
         zonename: item.zonename,
-        totalbins: item.totalbins,
-        activebins: item.activebins,
-        inactivebins: item.inactivebins,
+        // totalbins: item.totalbins,
+        // activebins: item.activebins,
+        // inactivebins: item.inactivebins,
         
       });
     }
@@ -103,7 +103,7 @@ const EditZone = ({ onclose ,item }) => {
                   
                   errors={errors}
                 />
-                <InputField
+                {/* <InputField
                   label="Total Bins"
                   name="totalbins"
                   placeholder="Select here"
@@ -126,7 +126,7 @@ const EditZone = ({ onclose ,item }) => {
                   register={register}
                   errors={errors}
                   placeholder="Type Here"
-                />
+                /> */}
 
                 
               </div>

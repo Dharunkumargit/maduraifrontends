@@ -6,16 +6,22 @@ import axios from "axios";
 import { API } from '../../../const';
 import { toast } from 'react-toastify';
 import EditBins from './EditBins';
+import Pagination from '../../components/Pagination';
 
 const Bins = () => {
   const [binData, setBinData] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+const [totalPages, setTotalPages] = useState(1);
 
+const LIMIT = 9;
   // -----------------------
   // 1️⃣ Fetch bins from backend
   // -----------------------
- const fetchbins = async () => {
+ const fetchbins = async (page = 1) => {
   try {
-    const res = await axios.get(`${API}/bins/getallbins`);
+    const res = await axios.get(
+      `${API}/bins/getallbins?page=${page}&limit=${LIMIT}`
+    );
 
     const formattedData = res.data.data.map((bin) => ({
       ...bin,
@@ -32,19 +38,17 @@ const Bins = () => {
     }));
 
     setBinData(formattedData);
+    setTotalPages(res.data.totalPages);
+    setCurrentPage(res.data.page);
   } catch (error) {
     console.log("Bin Fetch Error:", error);
   }
 };
 
-  // -----------------------
-  // 2️⃣ Initial fetch + live updates every 10 sec
-  // -----------------------
-  useEffect(() => {
-    fetchbins(); // initial fetch
 
-
-  }, []);
+ useEffect(() => {
+  fetchbins(currentPage);
+}, [currentPage]);
 
   // -----------------------
   // 3️⃣ Delete a bin
@@ -102,6 +106,12 @@ const Bins = () => {
         ViewModel={true}
         EditModal={EditBins}
         routepoint={"viewbins"}
+      />
+      <Pagination
+        totalItems={totalPages }
+        itemsPerPage={LIMIT}
+        currentPage={currentPage}
+        setCurrentPage={setCurrentPage}
       />
     </div>
   )

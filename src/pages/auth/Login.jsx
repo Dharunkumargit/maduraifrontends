@@ -97,7 +97,7 @@ const Login = () => {
           </div>
 
           {/* Login Card */}
-          <div className="w-full max-w-lg bg-white p-7 rounded-xl shadow-xl mx-4">
+          <div className="w-full max-w-lg bg-white p-10 rounded-xl shadow-xl mx-4">
             <div className="flex justify-center">
               <p className="text-4xl font-semibold my-4">Login</p>
             </div>
@@ -164,7 +164,7 @@ const Login = () => {
             </form>
 
             {/* Reset Password */}
-            <p className="text-right text-sm">
+            {/* <p className="text-right text-sm">
               Need Help?{" "}
               <span
                 onClick={() => navigate("/resetpassword")}
@@ -172,7 +172,7 @@ const Login = () => {
               >
                 Reset Password
               </span>
-            </p>
+            </p> */}
           </div>
         </div>
       </div>

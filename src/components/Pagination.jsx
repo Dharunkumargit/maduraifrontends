@@ -1,21 +1,21 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { GoArrowLeft, GoArrowRight } from "react-icons/go";
 
 const Pagination = ({
-  totalItems,
-  itemsPerPage,
-  currentPage,
+  totalItems = 0,
+  itemsPerPage = 10,
+  currentPage = 1,
   setCurrentPage,
 }) => {
   const totalPages = Math.ceil(totalItems / itemsPerPage);
 
   const paginate = (page) => {
-    if (page >= 1 && page <= totalPages) {
+    if (page >= 1 && page <= totalPages && page !== currentPage) {
       setCurrentPage(page);
     }
   };
 
-  const generatePageNumbers = () => {
+  const pageNumbers = useMemo(() => {
     const pages = [];
     const maxPagesToShow = 5;
 
@@ -32,42 +32,47 @@ const Pagination = ({
     }
 
     return pages;
-  };
+  }, [currentPage, totalPages]);
+
+  if (totalPages === 0) return null;
+
+  const startItem = (currentPage - 1) * itemsPerPage + 1;
+  const endItem = Math.min(currentPage * itemsPerPage, totalItems);
 
   return (
-    <div className="flex justify-between items-center mr-7 mt-2">
-      <p className="text-sm text-light-grey">
-        Showing the results {currentPage} of {totalPages}
+    <div className="flex flex-col sm:flex-row justify-between items-center gap-3 mt-4">
+      <p className="text-sm text-gray-500">
+        Showing the Pages of {startItem}–{endItem} of {totalItems}
       </p>
 
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2 mr-7">
         {/* First */}
         <button
           onClick={() => paginate(1)}
           disabled={currentPage === 1}
-          className={currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""}
+          className="disabled:opacity-40 disabled:cursor-not-allowed"
         >
           <GoArrowLeft />
         </button>
 
-        {/* Previous */}
+        {/* Prev */}
         <button
           onClick={() => paginate(currentPage - 1)}
           disabled={currentPage === 1}
-          className={currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""}
+          className="px-2 text-sm disabled:opacity-40 disabled:cursor-not-allowed"
         >
           Prev
         </button>
 
-        {/* Page Numbers */}
-        {generatePageNumbers().map((page) => (
+        {/* Pages */}
+        {pageNumbers.map((page) => (
           <button
             key={page}
             onClick={() => paginate(page)}
-            className={`px-2 py-1 rounded-md text-sm ${
+            className={`px-3 py-1 rounded-md text-sm transition ${
               currentPage === page
-                ? "bg-dark-yellow text-white bg-black font-semibold"
-                : "text-dark-yellow"
+                ? "bg-black text-white font-semibold"
+                : "text-yellow-600 hover:bg-yellow-100"
             }`}
           >
             {page}
@@ -78,9 +83,7 @@ const Pagination = ({
         <button
           onClick={() => paginate(currentPage + 1)}
           disabled={currentPage === totalPages}
-          className={
-            currentPage === totalPages ? "opacity-50 cursor-not-allowed" : ""
-          }
+          className="px-2 text-sm disabled:opacity-40 disabled:cursor-not-allowed"
         >
           Next
         </button>
@@ -88,10 +91,8 @@ const Pagination = ({
         {/* Last */}
         <button
           onClick={() => paginate(totalPages)}
-         disabled={currentPage === totalPages}
-          className={
-            currentPage === totalPages ? "opacity-50 cursor-not-allowed" : ""
-          }
+          disabled={currentPage === totalPages}
+          className="disabled:opacity-40 disabled:cursor-not-allowed"
         >
           <GoArrowRight />
         </button>

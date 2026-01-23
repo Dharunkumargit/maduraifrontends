@@ -8,9 +8,14 @@ import { API } from '../../../const';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import EditEmployee from './EditEmployee';
+import Pagination from '../../components/Pagination';
 
 const EmployeeManagement = () => {
   const [employees, setEmployees] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+
+  const itemsPerPage = 10;
   const Columns = [
     { label: "Name", key: "name" },
     
@@ -21,18 +26,22 @@ const EmployeeManagement = () => {
     { label: "Status", key: "status" },
     
   ];
-  const getEmployees = async () => {
+  const getEmployees = async (page = 1) => {
     try {
-      const res = await axios.get(`${API}/employee/getemployees`);
+      const res = await axios.get(
+        `${API}/employee/getemployees?page=${page}&limit=${itemsPerPage}`
+      );
+
       setEmployees(res.data.data);
+      setTotalItems(res.data.pagination.totalItems);
     } catch (err) {
       console.log("Error fetching employees:", err);
     }
   };
 
   useEffect(() => {
-    getEmployees();
-  }, []);
+    getEmployees(currentPage);
+  }, [currentPage]);
  
   const handleDelete = async (id) => {
   const confirmDelete = window.confirm(
@@ -48,7 +57,7 @@ const EmployeeManagement = () => {
 
     // ✅ Correct state update
     setEmployees((prev) => prev.filter((emp) => emp._id !== id));
-
+    getEmployees(currentPage)
   } catch (error) {
     console.error("Delete error:", error);
     toast.error(error.response?.data?.message || "Delete failed");
@@ -73,6 +82,12 @@ const EmployeeManagement = () => {
       showDeleteButton={true}
       onDelete={handleDelete}
       EditModal={EditEmployee}
+      />
+      <Pagination
+        totalItems={totalItems}
+        itemsPerPage={itemsPerPage}
+        currentPage={currentPage}
+        setCurrentPage={setCurrentPage}
       />
     </div>
   )

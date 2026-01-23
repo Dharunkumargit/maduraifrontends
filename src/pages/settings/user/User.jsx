@@ -10,24 +10,33 @@ import { API } from '../../../../const';
 import EditUser from './EditUser';
 import { toast } from 'react-toastify';
 import AddEmploye from '../../employeemanagement/AddEmploye';
+import Pagination from '../../../components/Pagination';
 
 const User = () => {
   const [users, setusers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   
-  const getAllUsers = async () => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+
+  const itemsPerPage = 8;
+
+  const getAllUsers = async (page = 1) => {
     try {
-      const res = await axios.get(`${API}/user/getuser`,);
-      console.log(res.data.data); // check structure
-      setusers(res.data.data); // ⬅ correct
+      const res = await axios.get(
+        `${API}/user/getuser?page=${page}&limit=${itemsPerPage}`
+      );
+
+      setusers(res.data.data);
+      setTotalItems(res.data.pagination.totalItems);
     } catch (error) {
       console.log("GET Users Error: ", error);
     }
   };
 
   useEffect(() => {
-    getAllUsers();
-  }, []);
+    getAllUsers(currentPage);
+  }, [currentPage]);
 
   const handleDeleteUser = async (id) => {
     const confirmDelete = window.confirm(
@@ -74,12 +83,17 @@ const User = () => {
       
       editroutepoint={"edituser"}
       onEdit={(row) => {
-        console.log("ROW CLICKED:", row); // ✅ DEBUG
+         // ✅ DEBUG
         setSelectedUser(row);
       }}
       
       />
-      
+      <Pagination
+        totalItems={totalItems}
+        itemsPerPage={itemsPerPage}
+        currentPage={currentPage}
+        setCurrentPage={setCurrentPage}
+      />
     </div>
   )
 }
