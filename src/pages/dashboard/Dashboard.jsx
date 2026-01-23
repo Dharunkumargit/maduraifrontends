@@ -55,25 +55,25 @@ const Dashboard = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-3">
           <SummaryCard
             status="Waste collected"
-            value="80"
+            value="80  Tons"
             title="Total Waste Collected"
             icon={<HiOutlineTrash size={20} />}
           />
           <SummaryCard
             status="Waste Collected"
-            value="12"
+            value="12  Tons"
             title="Month Wise Waste Collected"
             icon={<HiOutlineTrash size={20} />}
           />
           <SummaryCard
             status="Waste Collected"
-            value="24"
+            value="24  Tons"
             title="Average Waste Collected"
             icon={<HiOutlineTrash size={20} />}
           />
           <SummaryCard
             status="Collected Bins"
-            value="24"
+            value="24 Tons"
             title="Waste Collected"
             icon={<TbTrashX  size={21} />}
           />
@@ -119,7 +119,7 @@ const Dashboard = () => {
                   <tr className="bg-white text-center text-black font-semibold border-b-3 border-light-blue ">
                     <th className="py-4 px-4 text-sm">S.No</th>
                     <th className="py-4 px-4 text-sm">Zone</th>
-                    <th className="py-4 px-4 text-sm">Bin</th>
+                    
                     <th className="py-4 px-4 text-sm">Waste Collected</th>
                   </tr>
                 </thead>
@@ -131,7 +131,7 @@ const Dashboard = () => {
                     >
                       <td className="py-3 px-4 text-sm">{index + 1}</td>
                       <td className="py-3 px-4 text-sm">{bin.zone}</td>
-                      <td className="py-3 px-4 text-sm">{bin.bin}</td>
+                      
                       <td className="py-3 px-4 text-sm">{bin.waste}</td>
                     </tr>
                   ))}
@@ -155,7 +155,7 @@ const Dashboard = () => {
                   <tr className="bg-white text-center text-black font-bold border-b-3 border-light-blue text-sm">
                     <th className="py-4 px-5 text-sm">S.no</th>
                     <th className="py-4 px-5 text-sm">Ward</th>
-                    <th className="py-4 px-5 text-sm">Bin</th>
+                    
                     <th className="py-4 px-5 text-sm">Waste collected</th>
                   </tr>
                 </thead>
@@ -167,7 +167,7 @@ const Dashboard = () => {
                     >
                       <td className="py-3 px-5 text-sm">{index + 1}</td>
                       <td className="py-3 px-5 text-sm">{bin.ward}</td>
-                      <td className="py-3 px-5 text-sm">{bin.bin}</td>
+                     
                       <td className="py-3 px-5 text-sm">{bin.waste}</td>
                     </tr>
                   ))}

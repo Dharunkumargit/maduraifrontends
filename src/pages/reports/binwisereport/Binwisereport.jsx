@@ -3,18 +3,39 @@ import axios from "axios";
 import logo from "../../../assets/images/MaduraiLogo.png";
 import { IoMdArrowDropdown } from "react-icons/io";
 import Title from "../../../components/Title";
-import { API } from "../../../../const"; // Your API base URL
+import { API } from "../../../../const";
 
 const Binwisereport = () => {
-  const [reportData, setReportData] = useState([]);
+  const today = new Date().toISOString().split("T")[0];
+  const formatDisplayDate = (dateStr) => {
+  if (!dateStr) return "";
 
-  // Fetch bin report from backend
+  const date = new Date(dateStr);
+  return date.toLocaleDateString("en-IN", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
+};
+
+
+  const [fromDate, setFromDate] = useState(today);
+  const [toDate, setToDate] = useState(today);
+  const [reportData, setReportData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
+
+  // -------------------------
+  // Fetch bins once
+  // -------------------------
   useEffect(() => {
     const fetchReport = async () => {
       try {
-        const res = await axios.get(`${API}/bins/getbinreport`);
+        const res = await axios.get(`${API}/bins/getallbins`);
+    
+        
         if (res.data.success) {
-          setReportData(res.data.data); // Update state with fetched report
+          setReportData(res.data.data);
+          setFilteredData(res.data.data);
         }
       } catch (error) {
         console.error("Failed to fetch bin report:", error);
@@ -24,32 +45,48 @@ const Binwisereport = () => {
     fetchReport();
   }, []);
 
+  // -------------------------
+  // Filter based on date range
+  // -------------------------
+  useEffect(() => {
+    if (!fromDate || !toDate) return;
+
+    const from = new Date(fromDate);
+    from.setHours(0, 0, 0, 0);
+    const to = new Date(toDate);
+    to.setHours(23, 59, 59, 999);
+
+    const filtered = reportData.filter((item) => {
+      if (!item.lastReportedAt) return false;
+      const reportedDate = new Date(item.lastReportedAt);
+      return reportedDate >= from && reportedDate <= to;
+    });
+
+    setFilteredData(filtered);
+  }, [fromDate, toDate, reportData]);
+
   return (
     <div>
-      {/* Header and Date Filters */}
+      {/* Header */}
       <div className="flex items-center justify-between mb-4 mr-4">
-        <div>
-          <Title title="Reports" sub_title="Table" page_title="Reports" />
-        </div>
+        <Title title="Reports" sub_title="Table" page_title="Reports" />
 
         <div className="flex items-center space-x-3">
-          <div className="relative">
-            <input
-              type="date"
-              placeholder="From"
-              className="bg-white rounded-md pl-6 pr-4 py-3 focus:outline-none"
-            />
-          </div>
+          <input
+            type="date"
+            value={fromDate}
+            onChange={(e) => setFromDate(e.target.value)}
+            className="bg-white rounded-md pl-6 pr-4 py-3 focus:outline-none"
+          />
 
-          <div className="relative">
-            <input
-              type="date"
-              placeholder="To"
-              className="bg-white rounded-md pl-6 pr-4 py-3 focus:outline-none"
-            />
-          </div>
+          <input
+            type="date"
+            value={toDate}
+            onChange={(e) => setToDate(e.target.value)}
+            className="bg-white rounded-md pl-6 pr-4 py-3 focus:outline-none"
+          />
 
-          <button className="flex items-center justify-between bg-white rounded-md px-4 py-3 text-gray-700">
+          <button className="flex items-center bg-white rounded-md px-4 py-3 text-gray-700">
             Export <IoMdArrowDropdown className="ml-1" />
           </button>
 
@@ -59,66 +96,64 @@ const Binwisereport = () => {
         </div>
       </div>
 
-      {/* Report Title Section */}
+      {/* Report Title */}
       <div className="bg-white rounded-t-lg pl-10 pt-5 h-34 ml-5 mr-7 pr-10">
-        <div className="flex items-center justify-between w-full">
-          <div>
-            <img src={logo} alt="Logo" className="w-22 rounded-full mr-2" />
-          </div>
+        <div className="flex items-center justify-between">
+          <img src={logo} alt="Logo" className="w-22 rounded-full" />
 
-          <div>
-            <h2 className="text-xl text-center font-semibold">Bin-wise Report</h2>
-            <p className="text-gray-500 text-center text-sm">01.10.2025 - 10.10.2025</p>
-          </div>
-
-          <div className="text-right">
-            <p className="text-sm font-medium">
-              <span className="text-black font-semibold">Date:</span> 10.10.2025
+          <div className="text-center">
+            <h2 className="text-xl font-semibold">Bin-wise Report</h2>
+            <p className="text-gray-500 text-sm">
+             {formatDisplayDate(fromDate)} - {formatDisplayDate(toDate)}
             </p>
+          </div>
+
+          <div className="text-right text-sm">
+            <span className="font-semibold">Date:</span>{" "}
+            {new Date().toLocaleDateString("en-IN")}
           </div>
         </div>
       </div>
 
-      {/* Report Table */}
+      {/* Table */}
       <div className="bg-white rounded-b-lg pt-2 ml-5 mr-7 mt-1.5 mb-13">
         <div className="overflow-x-auto no-scrollbar">
           <table className="w-full border border-light-grey text-sm text-black">
-            <thead className="bg-[#EBEBEB] h-35">
+            <thead className="bg-[#EBEBEB]">
               <tr>
-                <th className="border border-light-grey p-5">S.no</th>
-                <th className="border border-light-grey p-4">Bin ID</th>
-                <th className="border border-light-grey p-4">Ward No</th>
-                <th className="border border-light-grey p-4">Zone Name</th>
-                <th className="border border-light-grey p-3">Total Bins Installed</th>
-                <th className="border border-light-grey p-3">Active Alerts</th>
-                <th className="border border-light-grey p-3">No of Times cleared</th>
-                <th className="border border-light-grey p-3">Average Response Time</th>
-                <th className="border border-light-grey p-3">TAT Compliance (%)</th>
-                <th className="border border-light-grey p-3">No. of Escalations</th>
-                <th className="border border-light-grey p-3">Total Garbage Collected (Tons)</th>
+                <th className="border p-4">S.no</th>
+                <th className="border p-4">Bin ID</th>
+                <th className="border p-4">Ward</th>
+                <th className="border p-4">Zone</th>
+                <th className="border p-4">Filled %</th>
+                <th className="border p-4">Times Cleared</th>
+                <th className="border p-4">Avg Response (mins)</th>
+                <th className="border p-4">Status</th>
+                <th className="border p-4">Total Collected</th>
               </tr>
             </thead>
+
             <tbody>
-              {reportData.length > 0 ? (
-                reportData.map((item) => (
-                  <tr key={item.id} className="text-center text-input-grey">
-                    <td className="border border-input-grey p-4">{item.id}</td>
-                    <td className="border border-input-grey p-4">{item.binid}</td>
-                    <td className="border border-input-grey p-4">{item.wardno}</td>
-                    <td className="border border-input-grey p-4">{item.zone}</td>
-                    <td className="border border-input-grey p-4">{item.totalBins}</td>
-                    <td className="border border-input-grey p-4">{item.activeAlerts}</td>
-                    <td className="border border-input-grey p-4">{item.cleared}</td>
-                    <td className="border border-input-grey p-4">{item.responseTime}</td>
-                    <td className="border border-input-grey p-4">{item.compliance}</td>
-                    <td className="border border-input-grey p-4">{item.escalations}</td>
-                    <td className="border border-input-grey p-4">{item.garbage}</td>
+              {filteredData.length > 0 ? (
+                filteredData.map((item, index) => (
+                  <tr key={item._id} className="text-center text-input-grey">
+                    <td className="border p-3">{index + 1}</td>
+                    <td className="border p-3">{item.binid}</td>
+                    <td className="border p-3">{item.ward}</td>
+                    <td className="border p-3">{item.zone}</td>
+                    <td className="border p-3">{item.filled}%</td>
+                    <td className="border p-3">{item.clearedCount}</td>
+                    <td className="border p-3">{item.avgClearTimeMins}</td>
+                    <td className="border p-3">{item.status}</td>
+                    <td className="border p-3">
+                      {item.totalClearedAmount} Tons
+                    </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan="11" className="text-center p-4 text-gray-500">
-                    Loading report data...
+                  <td colSpan="9" className="text-center p-4 text-gray-500">
+                    No data for selected date range
                   </td>
                 </tr>
               )}
@@ -127,8 +162,8 @@ const Binwisereport = () => {
         </div>
 
         <p className="text-center text-input-grey text-sm py-4">
-          Report generated on 10.01.2025 &nbsp;&nbsp; Powered by{" "}
-          <span className="font-semibold">madurai municipal corporation</span>
+          Report generated on {new Date().toLocaleDateString("en-IN")} &nbsp;
+          Powered by <span className="font-semibold">Madurai Municipal Corporation</span>
         </p>
       </div>
     </div>
@@ -136,4 +171,3 @@ const Binwisereport = () => {
 };
 
 export default Binwisereport;
-

@@ -136,12 +136,12 @@ const Zonewisereport = () => {
                     </td>
 
                     <td className="border border-input-grey p-4">
-                      {item.inactivebins}
+                      {item.totalClearedCount}
                     </td>
 
                     {/* Avg Response */}
                     <td className="border border-input-grey p-4">
-                      {item.avgResponseTime} mins
+                      {item.avgClearTime} mins
                     </td>
 
                     {/* TAT */}
@@ -151,7 +151,7 @@ const Zonewisereport = () => {
 
                     {/* Static temporary */}
                     <td className="border border-input-grey p-4">0</td>
-                    <td className="border border-input-grey p-4">0</td>
+                    <td className="border border-input-grey p-4">{item.totalGarbageTons} tons</td>
                   </tr>
                 ))
               ) : (

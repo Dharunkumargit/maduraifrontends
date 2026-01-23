@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import Title from "../../components/Title";
 import { useLocation } from "react-router";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
@@ -16,76 +16,47 @@ L.Icon.Default.mergeOptions({
     "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
 });
 
-const API_URL =
-  "http://ec2-54-157-168-45.compute-1.amazonaws.com:8000/latest";
-
-/* 🕒 Always show CURRENT system time */
-function getCurrentTime() {
-  return new Date().toLocaleString("en-IN", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
-
 const ViewBins = () => {
   const { state } = useLocation();
-  const user = state?.item;
-
+  const bin = state?.item; // data passed from table
   const [selectedImage, setSelectedImage] = useState(null);
-  const [binData, setBinData] = useState(null);
-  const [lastUpdated, setLastUpdated] = useState("-");
-  const [popupTime, setPopupTime] = useState("");
 
-  /* 🔄 Fetch latest bin data every 10 seconds */
-  useEffect(() => {
-    let isMounted = true;
+  if (!bin) return <p>No bin data available</p>;
 
-    const fetchBinData = async () => {
-      try {
-        const res = await fetch(API_URL);
-        const data = await res.json();
+  // 🕒 Get latest timestamp from history or latest_1
+  const history = bin.history ?? [];
+  const allUpdates = [
+    ...(bin.latest_1 ? [bin.latest_1] : []),
+    ...(bin.latest_2 ? [bin.latest_2] : []),
+    ...(bin.latest_3 ? [bin.latest_3] : []),
+    ...(bin.latest_4 ? [bin.latest_4] : []),
+    ...(bin.latest_5 ? [bin.latest_5] : []),
+    ...history,
+  ].filter(Boolean);
 
-        if (isMounted) {
-          setBinData(data);
-          setLastUpdated(getCurrentTime());
-        }
-      } catch (err) {
-        console.error("Failed to fetch bin data:", err);
-      }
-    };
+  const sortedUpdates = allUpdates.sort(
+    (a, b) => new Date(b.timestamp) - new Date(a.timestamp)
+  );
 
-    fetchBinData();
-    const interval = setInterval(fetchBinData, 10000);
-
-    return () => {
-      isMounted = false;
-      clearInterval(interval);
-    };
-  }, []);
-
-  /* 📸 Collect latest images */
-  const latestPhotos = useMemo(() => {
-    if (!binData) return [];
-
-    return Object.keys(binData)
-      .filter((k) => k.startsWith("latest_"))
-      .map((k) => binData[k])
-      .filter(Boolean)
-      .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-  }, [binData]);
-
-  const filled = binData?.latest_1?.fill_level ?? "-";
+  const latest = sortedUpdates[0];
+  const filled = latest?.fill_level ?? bin.filled ?? "-";
+  const lastUpdated = latest?.timestamp
+    ? new Date(latest.timestamp).toLocaleString("en-IN", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    : "-";
 
   const mainFields = [
-    { label: "Status", value: user?.status },
-    { label: "Bin ID", value: binData?.bin_id ?? user?.binid },
-    { label: "Zone", value: user?.zone },
-    { label: "Ward", value: user?.ward },
-    { label: "Bins", value: user?.bintype },
-    { label: "Capacity", value: user?.capacity },
+    { label: "Status", value: bin.status },
+    { label: "Bin ID", value: bin.binid },
+    { label: "Zone", value: bin.zone },
+    { label: "Ward", value: bin.ward },
+    { label: "Bin Type", value: bin.bintype },
+    { label: "Capacity", value: bin.capacity },
     { label: "Filled", value: filled !== "-" ? `${filled}%` : "-" },
     { label: "Location" },
     { label: "Last Updated", value: lastUpdated },
@@ -101,24 +72,19 @@ const ViewBins = () => {
           {mainFields.map((field, idx) => (
             <React.Fragment key={idx}>
               <p className="col-span-4 font-medium">{field.label}</p>
-
               <div className="col-span-6">
-                {/* 📍 LOCATION */}
                 {field.label === "Location" ? (
-                  !selectedImage && user?.latitude && user?.longitude ? (
+                  !selectedImage && bin.latitude && bin.longitude ? (
                     <MapContainer
-                      center={[Number(user.latitude), Number(user.longitude)]}
+                      center={[Number(bin.latitude), Number(bin.longitude)]}
                       zoom={14}
                       style={{ height: "200px", width: "60%" }}
                     >
                       <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
                       <Marker
-                        position={[
-                          Number(user.latitude),
-                          Number(user.longitude),
-                        ]}
+                        position={[Number(bin.latitude), Number(bin.longitude)]}
                       >
-                        <Popup>{user?.street || "Bin Location"}</Popup>
+                        <Popup>{bin.street || "Bin Location"}</Popup>
                       </Marker>
                     </MapContainer>
                   ) : (
@@ -126,19 +92,14 @@ const ViewBins = () => {
                   )
                 ) : field.label === "Latest Photos" ? (
                   <div className="flex gap-3 flex-wrap">
-                    {latestPhotos.map((p, i) => (
-                      <div key={i} className="flex flex-col items-center">
-                        <img
-                          src={p.image_url}
-                          alt="bin"
-                          className="w-24 h-24 rounded-lg cursor-pointer hover:scale-105 transition"
-                          onClick={() => {
-                            setSelectedImage(p.image_url);
-                            setPopupTime(getCurrentTime()); // ✅ current time
-                          }}
-                        />
-                        
-                      </div>
+                    {sortedUpdates.map((p, i) => (
+                      <img
+                        key={i}
+                        src={p.image_url}
+                        alt="bin"
+                        className="w-24 h-24 rounded-lg cursor-pointer hover:scale-105 transition"
+                        onClick={() => setSelectedImage(p.image_url)}
+                      />
                     ))}
                   </div>
                 ) : (
@@ -164,19 +125,11 @@ const ViewBins = () => {
           className="fixed inset-0 flex justify-center items-center backdrop-blur-sm bg-black/40 z-50"
           onClick={() => setSelectedImage(null)}
         >
-          <div
-            className=" p-4 rounded-xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <img
-              src={selectedImage}
-              alt="preview"
-              className="max-w-lg rounded-xl shadow-2xl"
-            />
-            <p className="text-center text-sm text-white mt-2">
-              Updated at: <span className="font-medium">{popupTime}</span>
-            </p>
-          </div>
+          <img
+            src={selectedImage}
+            alt="preview"
+            className="max-w-lg rounded-xl shadow-2xl"
+          />
         </div>
       )}
     </div>

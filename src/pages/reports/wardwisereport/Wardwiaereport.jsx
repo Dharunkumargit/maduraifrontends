@@ -6,13 +6,13 @@ import Title from "../../../components/Title";
 import { API } from "../../../../const";
 
 const Wardwiaereport = () => {
-
   const [reportData, setReportData] = useState([]);
 
   // API CALL FUNCTION
   const fetchWardReport = async () => {
     try {
-      const res = await axios.get(`${API}/ward/getwardreport`);
+      const res = await axios.get(`${API}/ward/getwards`);
+
       setReportData(res.data.data);
     } catch (error) {
       console.log("Ward Report Fetch Error:", error);
@@ -70,7 +70,8 @@ const Wardwiaereport = () => {
 
           <div className="text-right ">
             <p className="text-sm font-medium">
-              <span className="text-gray-700 font-semibold">Date:</span> 10.10.2025
+              <span className="text-gray-700 font-semibold">Date:</span>{" "}
+              10.10.2025
             </p>
           </div>
         </div>
@@ -84,29 +85,59 @@ const Wardwiaereport = () => {
                 <th className="border border-light-grey p-6  ">S.no</th>
                 <th className="border border-light-grey p-4 ">Ward Name </th>
                 <th className="border border-light-grey p-4 ">Zone Name</th>
-                <th className="border border-light-grey p-3 ">Total Bins Installed</th>
+                <th className="border border-light-grey p-3 ">
+                  Total Bins Installed
+                </th>
                 <th className="border border-light-grey p-3 ">Active Alerts</th>
-                <th className="border border-light-grey p-3 ">No of Times cleared</th>
-                <th className="border border-light-grey p-3 ">Average Response Time</th>
-                <th className="border border-light-grey p-3 ">TAT Compliance (%)</th>
-                <th className="border border-light-grey p-3 ">No. of Escalations</th>
-                <th className="border border-light-grey p-3 ">Total Garbage Collected (Tons)</th>
+                <th className="border border-light-grey p-3 ">
+                  No of Times cleared
+                </th>
+                <th className="border border-light-grey p-3 ">
+                  Average Response Time
+                </th>
+                <th className="border border-light-grey p-3 ">
+                  TAT Compliance (%)
+                </th>
+                <th className="border border-light-grey p-3 ">
+                  No. of Escalations
+                </th>
+                <th className="border border-light-grey p-3 ">
+                  Total Garbage Collected (Tons)
+                </th>
               </tr>
             </thead>
 
             <tbody>
-              {reportData.map((item) => (
-                <tr key={item.id} className="text-center text-input-grey ">
-                  <td className="border border-input-grey p-4">{item.id}</td>
-                  <td className="border border-input-grey p-4">{item.wardname}</td>
-                  <td className="border border-input-grey p-4">{item.zone}</td>
-                  <td className="border border-input-grey p-4">{item.totalBins}</td>
-                  <td className="border border-input-grey p-4">{item.activeAlerts}</td>
-                  <td className="border border-input-grey p-4">{item.cleared}</td>
-                  <td className="border border-input-grey p-4">{item.responseTime}</td>
-                  <td className="border border-input-grey p-4">{item.compliance}</td>
-                  <td className="border border-input-grey p-4">{item.escalations}</td>
-                  <td className="border border-input-grey p-4">{item.garbage}</td>
+              {reportData.map((item, index) => (
+                <tr key={item._id} className="text-center text-input-grey">
+                  <td className="border border-input-grey p-4">{index + 1}</td>
+                  <td className="border border-input-grey p-4">
+                    {item.wardname}
+                  </td>
+                  <td className="border border-input-grey p-4">
+                    {item.zonename}
+                  </td>
+                  <td className="border border-input-grey p-4">
+                    {item.totalbins}
+                  </td>
+                  <td className="border border-input-grey p-4">
+                    {item.activebins}
+                  </td>
+                  <td className="border border-input-grey p-4">
+                    {item.clearedCount}
+                  </td>
+                  <td className="border border-input-grey p-4">
+                    {item.avgClearTime}
+                  </td>
+                  <td className="border border-input-grey p-4">
+                    {item.compliance}
+                  </td>
+                  <td className="border border-input-grey p-4">
+                    {item.escalations}
+                  </td>
+                  <td className="border border-input-grey p-4">
+                    {item.clearedWeightKg} Tons
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -114,7 +145,7 @@ const Wardwiaereport = () => {
         </div>
 
         <p className="text-center text-input-grey text-sm  py-4">
-          Report generated on 10.01.2025 &nbsp;  &nbsp; Powered by{" "}
+          Report generated on 10.01.2025 &nbsp; &nbsp; Powered by{" "}
           <span className="font-semibold">madurai municipal corporation</span>
         </p>
       </div>
@@ -123,4 +154,3 @@ const Wardwiaereport = () => {
 };
 
 export default Wardwiaereport;
-
