@@ -98,7 +98,12 @@ const ViewBins = () => {
                         src={p.image_url}
                         alt="bin"
                         className="w-24 h-24 rounded-lg cursor-pointer hover:scale-105 transition"
-                        onClick={() => setSelectedImage(p.image_url)}
+                        onClick={() =>
+                          setSelectedImage({
+                            image: p.image_url,
+                            timestamp: p.timestamp,
+                          })
+                        }
                       />
                     ))}
                   </div>
@@ -125,11 +130,32 @@ const ViewBins = () => {
           className="fixed inset-0 flex justify-center items-center backdrop-blur-sm bg-black/40 z-50"
           onClick={() => setSelectedImage(null)}
         >
-          <img
-            src={selectedImage}
-            alt="preview"
-            className="max-w-lg rounded-xl shadow-2xl"
-          />
+          <div
+            className=""
+            onClick={(e) => e.stopPropagation()}
+          >
+            <img
+              src={selectedImage.image}
+              alt="preview"
+              className="max-w-lg rounded-lg"
+            />
+
+            <p className="text-sm text-white mt-2 text-center">
+              Last Updated:{" "}
+              {selectedImage.timestamp
+                ? new Date(selectedImage.timestamp).toLocaleString(
+                    "en-IN",
+                    {
+                      day: "2-digit",
+                      month: "short",
+                      year: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    }
+                  )
+                : "-"}
+            </p>
+          </div>
         </div>
       )}
     </div>

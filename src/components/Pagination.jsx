@@ -40,7 +40,7 @@ const Pagination = ({
   const endItem = Math.min(currentPage * itemsPerPage, totalItems);
 
   return (
-    <div className="flex flex-col sm:flex-row justify-between items-center gap-3 mt-4">
+    <div className="flex flex-col sm:flex-row justify-between items-center gap-3 mt-1">
       <p className="text-sm text-gray-500">
         Showing the Pages of {startItem}–{endItem} of {totalItems}
       </p>

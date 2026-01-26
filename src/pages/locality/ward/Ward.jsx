@@ -14,11 +14,13 @@ const Ward = () => {
   const [wards, setWards] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
+  const [loading, setLoading] = useState(false);
 
   const itemsPerPage = 8;
 
   const getWards = async (page = 1) => {
     try {
+      setLoading(true);
       const res = await axios.get(
         `${API}/ward/getwards?page=${page}&limit=${itemsPerPage}`
       );
@@ -27,6 +29,8 @@ const Ward = () => {
       setTotalItems(res.data.pagination.totalItems);
     } catch (error) {
       console.log("Ward Fetch Error:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -65,6 +69,7 @@ const Ward = () => {
         EditModal={EditWard}
         showViewButton={false}
         tabledata={wards} 
+        loading={loading}
         onDelete={handleWarddelete}
         addButtonLabel="Add Ward"
         addButtonIcon={<RiUserAddLine size={22} />}

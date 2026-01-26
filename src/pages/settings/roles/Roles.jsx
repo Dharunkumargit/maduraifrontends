@@ -9,12 +9,16 @@ import { API } from '../../../../const';
 
 const Roles = () => {
   const [roleData, setRoleData] = useState([]);
+  const [loading, setLoading] = useState(false);
   const getRoles = async () => {
     try {
+      setLoading(true);
       const response = await axios.get(`${API}/roles/getroles`);
       setRoleData(response.data.data);
     } catch (error) {
       toast.error("Fetch Role Error", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -55,6 +59,7 @@ const Roles = () => {
       AddModal={true}
       tabledata={roleData}
       onDelete={handleDeleteRole}
+      loading={loading}
       showViewButton={false}
       addroutepoint={"addroles"}
       EditModal={true}

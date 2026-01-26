@@ -11,16 +11,18 @@ import Pagination from '../../components/Pagination';
 const Bins = () => {
   const [binData, setBinData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-const [totalPages, setTotalPages] = useState(1);
+  const [loading, setLoading] = useState(false);
+const [totalPages, setTotalPages] = useState(0);
 
-const LIMIT = 9;
+const itemsPerPage = 9;
   // -----------------------
   // 1️⃣ Fetch bins from backend
   // -----------------------
  const fetchbins = async (page = 1) => {
   try {
+    setLoading(true);
     const res = await axios.get(
-      `${API}/bins/getallbins?page=${page}&limit=${LIMIT}`
+      `${API}/bins/getallbins?page=${page}&limit=${itemsPerPage}`
     );
 
     const formattedData = res.data.data.map((bin) => ({
@@ -39,9 +41,11 @@ const LIMIT = 9;
 
     setBinData(formattedData);
     setTotalPages(res.data.totalPages);
-    setCurrentPage(res.data.page);
+    setCurrentPage(res.data.currentPage);
   } catch (error) {
     console.log("Bin Fetch Error:", error);
+  } finally {
+    setLoading(false);
   }
 };
 
@@ -105,11 +109,12 @@ const LIMIT = 9;
         )}
         ViewModel={true}
         EditModal={EditBins}
+        loading={loading}
         routepoint={"viewbins"}
       />
       <Pagination
-        totalItems={totalPages }
-        itemsPerPage={LIMIT}
+        totalItems={totalPages}
+        itemsPerPage={itemsPerPage}
         currentPage={currentPage}
         setCurrentPage={setCurrentPage}
       />

@@ -8,9 +8,10 @@ import { API } from "../../../../const";
 
 const AddRoles = () => {
   const [roleName, setRoleName] = useState("");
-  const [createdBy, setCreatedBy] = useState("System");
+  const [createdBy, setCreatedBy] = useState("Adminstrator");
   const [selectedSettings, setSelectedSettings] = useState({});
   const [permissions, setPermissions] = useState({});
+  const [roles, setRoles] = useState([]);
   const navigate = useNavigate();
 
   const settingsOptions = [
@@ -79,31 +80,35 @@ const AddRoles = () => {
     if (!roleName.trim()) {
       return toast.error("Role name is required!");
     }
-  
-    if (Object.keys(permissions).length === 0) {
-      return toast.error("Select at least one feature with permissions!");
-    }
-  
-    const accessLevels = Object.entries(permissions).map(
-      ([feature, perms]) => ({
-        feature,
-        permissions: perms.filter((p) => p !== "All"),
-      })
+
+    const hasValidAccess = Object.values(permissions).some(
+      (perms) => Array.isArray(perms) && perms.length > 0
     );
-  
+    if (!hasValidAccess) {
+      return toast.error("Select at least one setting with permissions!");
+    }
+
+    const accessLevels = Object.entries(permissions).filter(([_, perms]) => perms.length > 0).map(([feature, perms]) => ({
+      feature,
+      permissions: perms,
+    }));
+
+    const selectedRoleObj = roles.find((r) => r._id === roleName);
+
     const roleAccessLevel = {
-      role_name: roleName,
-      status: "ACTIVE",
-      accessLevels,
+      role_id: selectedRoleObj ? selectedRoleObj._id : null,
+      role_name: selectedRoleObj ? selectedRoleObj.role_name : roleName,
       created_by_user: createdBy,
+      accessLevels,
+      status: "ACTIVE",
     };
-  
+
     try {
       const response = await axios.post(
         `${API}/roles/addrole`,
         roleAccessLevel
       );
-  
+
       console.log("Saved role:", response.data);
       toast.success("Role created successfully!");
       setTimeout(() => {

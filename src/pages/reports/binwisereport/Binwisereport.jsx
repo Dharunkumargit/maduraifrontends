@@ -4,110 +4,157 @@ import logo from "../../../assets/images/MaduraiLogo.png";
 import { IoMdArrowDropdown } from "react-icons/io";
 import Title from "../../../components/Title";
 import { API } from "../../../../const";
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
 
 const Binwisereport = () => {
   const today = new Date().toISOString().split("T")[0];
+  
   const formatDisplayDate = (dateStr) => {
-  if (!dateStr) return "";
-
-  const date = new Date(dateStr);
-  return date.toLocaleDateString("en-IN", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-  });
-};
-
+    if (!dateStr) return "";
+    const date = new Date(dateStr);
+    return date.toLocaleDateString("en-IN", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    });
+  };
 
   const [fromDate, setFromDate] = useState(today);
   const [toDate, setToDate] = useState(today);
-  const [reportData, setReportData] = useState([]);
-  const [filteredData, setFilteredData] = useState([]);
+  const [binsData, setBinsData] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  // -------------------------
-  // Fetch bins once
-  // -------------------------
-  useEffect(() => {
-    const fetchReport = async () => {
-      try {
-        const res = await axios.get(`${API}/bins/getallbins`);
-    
-        
-        if (res.data.success) {
-          setReportData(res.data.data);
-          setFilteredData(res.data.data);
-        }
-      } catch (error) {
-        console.error("Failed to fetch bin report:", error);
+  const fetchBinReport = async () => {
+    try {
+      setLoading(true);
+      const from = fromDate || today;
+      const to = toDate || today;
+
+      const res = await axios.get(
+        `${API}/binfullevents/binwise?from=${from}&to=${to}`
+      );
+      console.log(res);
+      
+      if (res.data.success) {
+        setBinsData(
+          res.data.data.map((bin) => ({
+            binid: bin.binid,
+            ward: bin.ward,
+            zone: bin.zone,
+            location: bin.location,
+            capacity: bin.capacity,
+            tonsCleared: bin.tonsCleared,
+            responseTime: bin.avgResponseTime,
+          }))
+        );
       }
-    };
+    } catch (error) {
+      console.error("Error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchReport();
-  }, []);
-
-  // -------------------------
-  // Filter based on date range
-  // -------------------------
   useEffect(() => {
-    if (!fromDate || !toDate) return;
+    fetchBinReport();
+  }, [fromDate, toDate]);
 
-    const from = new Date(fromDate);
-    from.setHours(0, 0, 0, 0);
-    const to = new Date(toDate);
-    to.setHours(23, 59, 59, 999);
-
-    const filtered = reportData.filter((item) => {
-      if (!item.lastReportedAt) return false;
-      const reportedDate = new Date(item.lastReportedAt);
-      return reportedDate >= from && reportedDate <= to;
+  // 🔥 PDF Export - EXACT SAME AS WARDWISE
+  const exportPDF = () => {
+    const doc = new jsPDF();
+    doc.text("Bin-wise Waste Management Report", 14, 16);
+    
+    autoTable(doc, {
+      startY: 25,
+      head: [["S.no", "Bin ID", "Ward", "Zone", "Location", "Capacity", "Tons Cleared", "Response Time"]],
+      body: binsData.map((item, index) => [
+        index + 1,
+        item.binid,
+        item.ward,
+        item.zone,
+        item.location,
+        `${item.capacity}L`,
+        `${item.tonsCleared}T`,
+        `${item.responseTime} mins`
+      ])
     });
+    
+    doc.save(`BinReport_${fromDate}_to_${toDate}.pdf`);
+  };
 
-    setFilteredData(filtered);
-  }, [fromDate, toDate, reportData]);
+  // 🔥 Excel Export - EXACT SAME AS WARDWISE
+  const exportExcel = () => {
+    const data = binsData.map((item, index) => ({
+      "S.no": index + 1,
+      "Bin ID": item.binid,
+      "Ward": item.ward,
+      "Zone": item.zone,
+      "Location": item.location,
+      "Capacity": `${item.capacity}L`,
+      "Tons Cleared": `${item.tonsCleared}T`,
+      "Response Time": `${item.responseTime} mins`
+    }));
+    
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "BinReport");
+    const buf = XLSX.write(wb, { type: "array", bookType: "xlsx" });
+    saveAs(new Blob([buf]), `BinReport_${fromDate}_to_${toDate}.xlsx`);
+  };
 
   return (
     <div>
-      {/* Header */}
+      {/* Header - EXACT SAME LAYOUT AS WARDWISE */}
       <div className="flex items-center justify-between mb-4 mr-4">
-        <Title title="Reports" sub_title="Table" page_title="Reports" />
+        <div>
+          <Title title="Reports" sub_title="Table" page_title="Reports" />
+        </div>
 
         <div className="flex items-center space-x-3">
           <input
             type="date"
+            className="bg-white rounded-md px-4 py-3"
             value={fromDate}
             onChange={(e) => setFromDate(e.target.value)}
-            className="bg-white rounded-md pl-6 pr-4 py-3 focus:outline-none"
           />
-
           <input
             type="date"
+            className="bg-white rounded-md px-4 py-3"
             value={toDate}
             onChange={(e) => setToDate(e.target.value)}
-            className="bg-white rounded-md pl-6 pr-4 py-3 focus:outline-none"
           />
 
-          <button className="flex items-center bg-white rounded-md px-4 py-3 text-gray-700">
-            Export <IoMdArrowDropdown className="ml-1" />
+          {/* 🔥 SEPARATE PDF BUTTON - SAME AS WARDWISE */}
+          <button 
+            className="flex items-center bg-white rounded-md px-4 py-3 text-gray-700" 
+            onClick={exportPDF}
+          >
+            Export PDF <IoMdArrowDropdown className="ml-1" />
           </button>
 
-          <button className="bg-darkest-blue text-white rounded-md px-5 py-3">
-            Continue
+          {/* 🔥 SEPARATE EXCEL BUTTON - SAME AS WARDWISE */}
+          <button 
+            className="flex items-center bg-white rounded-md px-4 py-3 text-gray-700" 
+            onClick={exportExcel}
+          >
+            Export Excel <IoMdArrowDropdown className="ml-1" />
           </button>
         </div>
       </div>
 
-      {/* Report Title */}
+      {/* Header Card */}
       <div className="bg-white rounded-t-lg pl-10 pt-5 h-34 ml-5 mr-7 pr-10">
         <div className="flex items-center justify-between">
           <img src={logo} alt="Logo" className="w-22 rounded-full" />
-
           <div className="text-center">
             <h2 className="text-xl font-semibold">Bin-wise Report</h2>
             <p className="text-gray-500 text-sm">
-             {formatDisplayDate(fromDate)} - {formatDisplayDate(toDate)}
+              {formatDisplayDate(fromDate)} - {formatDisplayDate(toDate)}
             </p>
           </div>
-
           <div className="text-right text-sm">
             <span className="font-semibold">Date:</span>{" "}
             {new Date().toLocaleDateString("en-IN")}
@@ -125,45 +172,62 @@ const Binwisereport = () => {
                 <th className="border p-4">Bin ID</th>
                 <th className="border p-4">Ward</th>
                 <th className="border p-4">Zone</th>
-                <th className="border p-4">Filled %</th>
-                <th className="border p-4">Times Cleared</th>
-                <th className="border p-4">Avg Response (mins)</th>
-                <th className="border p-4">Status</th>
-                <th className="border p-4">Total Collected</th>
+                <th className="border p-4">Location</th>
+                <th className="border p-4">Capacity</th>
+                <th className="border p-4">Tons Cleared</th>
+                <th className="border p-4">Response Time</th>
               </tr>
             </thead>
-
             <tbody>
-              {filteredData.length > 0 ? (
-                filteredData.map((item, index) => (
-                  <tr key={item._id} className="text-center text-input-grey">
+              {loading ? (
+                <tr>
+                  <td colSpan="8" className="text-center p-8 text-gray-500">
+                    <div className="flex flex-col items-center space-y-2">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                      <span>Loading bin data...</span>
+                    </div>
+                  </td>
+                </tr>
+              ) : binsData.length > 0 ? (
+                binsData.map((item, index) => (
+                  <tr
+                    key={item._id || item.binid || index}
+                    className="text-center text-input-grey hover:bg-gray-50"
+                  >
                     <td className="border p-3">{index + 1}</td>
-                    <td className="border p-3">{item.binid}</td>
+                    <td className="border p-3 font-medium">{item.binid}</td>
                     <td className="border p-3">{item.ward}</td>
                     <td className="border p-3">{item.zone}</td>
-                    <td className="border p-3">{item.filled}%</td>
-                    <td className="border p-3">{item.clearedCount}</td>
-                    <td className="border p-3">{item.avgClearTimeMins}</td>
-                    <td className="border p-3">{item.status}</td>
-                    <td className="border p-3">
-                      {item.totalClearedAmount} Tons
+                    <td className="border p-3  max-w-xs truncate">
+                      {item.location}
+                    </td>
+                    <td className="border p-3 font-medium">{item.capacity}L</td>
+                    <td className="border p-3 font-bold text-green-600">
+                      <strong>{item.tonsCleared}T</strong>
+                    </td>
+                    <td className=" p-3 font-semibold  ">
+                      {item.responseTime} mins
                     </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan="9" className="text-center p-4 text-gray-500">
-                    No data for selected date range
+                  <td colSpan="8" className="text-center p-8 text-gray-500">
+                    <div className="space-y-2">
+                      <div className="text-2xl mx-auto w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
+                        📊
+                      </div>
+                      <p>No collection data for selected date</p>
+                    </div>
                   </td>
                 </tr>
               )}
             </tbody>
           </table>
         </div>
-
         <p className="text-center text-input-grey text-sm py-4">
-          Report generated on {new Date().toLocaleDateString("en-IN")} &nbsp;
-          Powered by <span className="font-semibold">Madurai Municipal Corporation</span>
+          Report generated on {new Date().toLocaleDateString("en-IN")} | Powered by{" "}
+          <span className="font-semibold">Madurai Municipal Corporation</span>
         </p>
       </div>
     </div>

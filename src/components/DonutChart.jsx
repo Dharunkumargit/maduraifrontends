@@ -21,7 +21,7 @@ const DonutChart = ({
         <h3 className="text-base font-semibold text-gray-800">{title}</h3>
 
         <div className="relative w-32 text-sm">
-          
+{/*           
           <button
             onClick={() => setIsOpen((prev) => !prev)}
             className="w-full h-9 flex justify-between items-center pl-3 rounded-md bg-white shadow-sm text-gray-600"
@@ -35,7 +35,7 @@ const DonutChart = ({
                 }`}
               />
             </span>
-          </button>
+          </button> */}
 
           
           {isOpen && (
@@ -81,7 +81,10 @@ const DonutChart = ({
                   />
                 ))}
               </Pie>
-              <Tooltip />
+             <Tooltip 
+    formatter={(value) => [`${value} Tons`, 'Total Waste']}  // 🔥 SHOWS "3 Tons"
+    labelFormatter={(label) => `Zone: ${label}`}             // 🔥 "Zone: Zone 1"
+  />
             </PieChart>
           </ResponsiveContainer>
         </div>

@@ -9,11 +9,13 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import EditEmployee from './EditEmployee';
 import Pagination from '../../components/Pagination';
+import { set } from 'mongoose';
 
 const EmployeeManagement = () => {
   const [employees, setEmployees] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
+  const [loading, setLoading] = useState(false);
 
   const itemsPerPage = 10;
   const Columns = [
@@ -28,14 +30,18 @@ const EmployeeManagement = () => {
   ];
   const getEmployees = async (page = 1) => {
     try {
+      setLoading(true);
       const res = await axios.get(
         `${API}/employee/getemployees?page=${page}&limit=${itemsPerPage}`
       );
 
       setEmployees(res.data.data);
       setTotalItems(res.data.pagination.totalItems);
+      setCurrentPage(res.data.pagination.currentPage);
     } catch (err) {
       console.log("Error fetching employees:", err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -79,6 +85,7 @@ const EmployeeManagement = () => {
       }} />}
       
       showViewButton={false}
+      loading={loading}
       showDeleteButton={true}
       onDelete={handleDelete}
       EditModal={EditEmployee}

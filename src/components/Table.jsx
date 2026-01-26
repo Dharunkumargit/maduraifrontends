@@ -9,6 +9,7 @@ import { LuEye } from "react-icons/lu";
 import { Pencil } from "lucide-react";
 import { useNavigate } from "react-router";
 import Pagination from "./Pagination";
+import Loader from "./Loader";
 
 const Table = ({
   title,
@@ -26,6 +27,7 @@ const Table = ({
   AddModal,
   showActions = true,
   EditModal,
+  loading=false,
   onDelete,
   editroutepoint,
   onEdit,
@@ -160,7 +162,17 @@ const Table = ({
                 </tr>
               </thead>
               <tbody className="text-light-grey bg-white   text-sm font-light">
-                {sortedItems.length > 0 ? (
+                {loading ? (
+                  <tr>
+                    <td
+                      colSpan={colomns.length + 2}
+                      className="text-center py-8"
+                    >
+                     <Loader />
+                    </td>
+                  </tr>
+                ) :
+                sortedItems.length > 0 ? (
                   sortedItems.map((item, index) => (
                     <tr
                       key={index}
@@ -284,7 +296,7 @@ const Table = ({
                   <tr>
                     <td
                       colSpan={colomns.length + 2}
-                      className="text-center py-4"
+                      className="  text-center py-4"
                     >
                       No data available
                     </td>

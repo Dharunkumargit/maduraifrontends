@@ -15,7 +15,7 @@ import Pagination from '../../../components/Pagination';
 const User = () => {
   const [users, setusers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
-  
+  const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
 
@@ -23,6 +23,7 @@ const User = () => {
 
   const getAllUsers = async (page = 1) => {
     try {
+      setLoading(true);
       const res = await axios.get(
         `${API}/user/getuser?page=${page}&limit=${itemsPerPage}`
       );
@@ -31,6 +32,8 @@ const User = () => {
       setTotalItems(res.data.pagination.totalItems);
     } catch (error) {
       console.log("GET Users Error: ", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -72,6 +75,7 @@ const User = () => {
       addButtonIcon={<RiUserAddLine size={22}/>}
       colomns={Columns}
       tabledata={users}
+      loading={loading}
       showViewButton={false}
       onDelete={handleDeleteUser}
       AddModal={(modalProps) => <AddUser {...modalProps} onclose={() => {

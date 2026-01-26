@@ -14,9 +14,11 @@ const Zone = () => {
   const [zones, setZones] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
+  const [loading, setLoading] = useState(false);
   const itemsPerPage = 8;
   const getZones = async (page = 1) => {
     try {
+      setLoading(true);
       const res = await axios.get(
         `${API}/zone/getzones?page=${page}&limit=${itemsPerPage}`,
       );
@@ -26,6 +28,8 @@ const Zone = () => {
       setCurrentPage(res.data.currentPage);
     } catch (error) {
       console.log("Zone Fetch Error:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -69,6 +73,7 @@ const Zone = () => {
         showViewButton={false}
         addButtonLabel="Add Zone"
         EditModal={EditZone}
+        loading={loading}
         onDelete={handleZonedelete}
         addButtonIcon={<LuMapPin size={22} />}
         AddModal={(props) => <AddZone {...props} onRefresh={getZones} />}
