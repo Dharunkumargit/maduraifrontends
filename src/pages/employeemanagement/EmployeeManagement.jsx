@@ -62,7 +62,7 @@ const EmployeeManagement = () => {
     toast.success("Employee deleted successfully");
 
     // ✅ Correct state update
-    setEmployees((prev) => prev.filter((emp) => emp._id !== id));
+     setEmployees((prev) => prev.filter((emp) => emp._id !== id));
     getEmployees(currentPage)
   } catch (error) {
     console.error("Delete error:", error);
